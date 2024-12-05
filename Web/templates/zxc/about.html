@@ -1,0 +1,108 @@
+{% extends "zxc/base.html" %}
+<head>
+    {% load static %}
+    <style>
+        .card {
+            flex: 1 1 auto; /* Увеличивает гибкость ширины карточек */
+            min-width: 300px; /* Минимальная ширина карточки */
+            background-color: wheat;
+        }
+        .card-deck {
+            gap: 20px; /* Расстояние между карточками */
+            background-color: wheat;
+        }
+        .badge-wheat {
+            background-color: wheat; /* Цвет фона - пшеничный */
+            color: black; /* Текст становится читабельным - черный цвет */
+            padding: 10px 15px; /* Отступы */
+            border-radius: 5px; /* Закругленные края для красоты */
+            font-size: 1rem; /* Размер текста */
+        }
+        
+    </style>
+</head>
+{% block content %}
+<div class="container-fluid text-center">
+    <h1>О нас</h1>
+    <p>Миссия Online-Курс — дать возможность каждому быть актуальным и востребованным специалистом прямо сейчас. Вне зависимости от возраста и географии.</p>
+    
+    <div class="my-4">
+        <img src="{% static 'images/online.jpg' %}" width="900px" height="400px" alt="Учим">
+    </div>
+
+    <h2>Мы предлагаем большой выбор</h2>
+    <p>Много курсов по востребованным направлениям. Найдите то, что подходит именно вам.</p>
+    
+    <div class="tags">
+        <span class="badge-wheat">Программирование</span>
+        <span class="badge-wheat">Игры</span>
+        <span class="badge-wheat">Кино и Музыка</span>
+        <span class="badge-wheat">Английский язык</span>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row my-2">
+            <div class="col text-center">
+                <h2>Как устроена платформа Online-Курс</h2>
+            </div>
+        </div>
+    </div>
+    <div class="row my-4 justify-content-center">
+        <div class="col-10">
+            <div class="card-deck">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">01. Круглосуточный доступ к личному кабинету</h5>
+                        <p class="card-text">Смотрите видео онлайн в удобное время</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row my-4 justify-content-center">
+        <div class="col-10">
+            <div class="card-deck">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">02. Курсы обновляются регулярно</h5>
+                        <p class="card-text">Получаете знания, которые отвечают требованиям рынка труда</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row my-4 justify-content-center">
+        <div class="col-10">
+            <div class="card-deck">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">03. Проверочные тесты и практические задания</h5>
+                        <p class="card-text">Закрепляете теорию на практике и получаете обратную связь</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <h3 class="mt-5">Основатели платформы</h3>
+    <div class="row justify-content-center">
+        <div class="col-3">
+            <img src="{% static 'images/ivan.jpg' %}" class="img-fluid rounded-circle" alt="Иван Павлюченко">
+            <h5>Иван Павлюченко</h5>
+            <p>Основатель и генеральный директор Online-Курс.</p>
+        </div>
+        <div class="col-3">
+            <img src="{% static 'images/anna.jpg' %}" class="img-fluid rounded-circle" alt="Анна Иванченко">
+            <h5>Анна Иванченко</h5>
+            <p>Основатель и программный директор Online-Курс.</p>
+        </div>
+        <div class="col-3">
+            <img src="{% static 'images/petr.jpeg' %}" class="img-fluid rounded-circle" alt="Петр Карпин">
+            <h5>Петр Карпин</h5>
+            <p>Основатель и продуктовый директор Online-Курс.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

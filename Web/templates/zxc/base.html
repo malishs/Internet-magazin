@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Online-Курс{% endblock title %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Prosto Sans', sans-serif;
+        }
+        header {
+            background-color: wheat;
+            color: black;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        .promo-banner {
+            background-color: #ffcc00;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .header-links {
+            display: flex;
+            justify-content: space-between; /* Элементы в противоположные стороны */
+            align-items: center;
+            padding: 10px 20px;
+            background-color: wheat; /* Белый фон */
+            font-family: Arial black, sans-serif;
+        }       
+        .header-links a {
+            margin-right: 10px;
+            text-decoration: none;
+            color: #333;
+        }
+        .tag-container {
+            margin: 15px 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            color: wheat;
+        }
+        .tag {
+            background-color: wheat;
+            border-radius: 20px;
+            padding: 10px 15px;
+            margin: 5px;
+            color: #0073e6;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+        .dropdown-menu.show {
+            display: block !important;
+        }
+        .dropdown .dropdown-menu a:hover {
+            background-color: #f0f0f0;
+        }
+        .dropdown .btn {
+            background-color: wheat; /* Цвет фона кнопки */
+            color: #333; /* Цвет текста */
+            border: none; /* Убираем рамку, если нужно */
+        }
+        .dropdown .btn:hover {
+            background-color: wheat; /* Цвет фона кнопки при наведении (можете оставить wheat или выбрать чуть темнее) */
+            color: #000; /* Цвет текста при наведении */
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between; /* Разделяет элементы на разных сторонах */
+            align-items: center;
+            padding: 10px 20px;
+            background-color: wheat;
+        }
+        .navbar-left {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .navbar-right {
+            display: flex;
+            gap: 15px;
+
+        }
+        .navbar-left a {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333; /* Цвет текста */
+            text-decoration: none; /* Убираем подчеркивание */
+            border: 2px solid #333; /* Чёрная обводка */
+            border-radius: 10px; /* Скругленные углы */
+            background-color: transparent; /* Прозрачный фон */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Лёгкая тень */
+            transition: all 0.3s ease-in-out; /* Плавный переход эффектов */
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-links d-flex justify-content-between">
+    <div class="navbar">
+        <div class="navbar-left">
+            <a href="{% url 'index' %}">Online-Курс</a>
+        </div>
+    </div>
+    <div class="navbar">
+        <div class="navbar-right">
+    <div class="header-links d-flex justify-content-between">
+        <div class="dropdown d-inline-block">
+            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownCatalog" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: wheat; color: #333; border: 2px solid #333; border-radius: 10px; 
+            text-transform: uppercase; font-weight: bold; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); 
+            transition: all 0.3s ease-in-out;">
+                Каталог
+            </a>
+            <div class="dropdown-menu" aria-labelledby="dropdownCatalog">
+                <a class="dropdown-item" href="{% url 'programming_courses' %}">Программирование</a>
+                <a class="dropdown-item" href="{% url 'game_courses' %}">Игры</a>
+                <a class="dropdown-item" href="{% url 'english_courses' %}">Ангийский язык</a>
+                <a class="dropdown-item" href="{% url 'musicandcinema_courses' %}">Кино и Музыка</a>
+            </div>
+        </div>
+    </div>
+        </div>
+    <div class="navbar">
+        <div class="dropdown d-inline-block">
+            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownCatalog" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: wheat; color: #333; border: 2px solid #333; border-radius: 10px; 
+            text-transform: uppercase; font-weight: bold; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); 
+            transition: all 0.3s ease-in-out;">
+                О Online-курс
+            </a>
+            <div class="dropdown-menu" aria-labelledby="dropdownCatalog">
+                <a class="dropdown-item" href="{% url 'about' %}">О нас</a>
+                <a class="dropdown-item" href="{% url 'contact' %}">Контакты</a>
+            </div>
+        </div>
+        </div>
+        {% if user.is_authenticated %}
+        <div class="header-links d-flex justify-content-between">
+        <a href="{% url 'profile' %}" class="btn btn-secondary" style="background-color: wheat; color: #333; border: 2px solid #333; border-radius: 10px; 
+        text-transform: uppercase; font-weight: bold; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); 
+        transition: all 0.3s ease-in-out;">Профиль</a>
+        <!-- Кнопка "Выйти" -->
+        <a href="{% url 'logout' %}" class="btn btn-secondary" style="background-color: wheat; color: #333; border: 2px solid #333; border-radius: 10px; 
+        text-transform: uppercase; font-weight: bold; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); 
+        transition: all 0.3s ease-in-out;">Выйти</a>
+        {% else %}
+        <a href="{% url 'login' %}" class="btn btn-secondary" style="background-color: wheat; color: #333; border: 2px solid #333; border-radius: 10px; 
+        text-transform: uppercase; font-weight: bold; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); 
+        transition: all 0.3s ease-in-out;">Войти</a>
+        {% endif %}
+        </div>
+    </div>
+    </div>
+    </div>
+</header>
+
+<div class="container">
+    {% block content %}{% endblock content %}
+</div>
+
+<footer>
+    <p>Copyright &copy; 2024 Online-Курс, Все права защищены.</p>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

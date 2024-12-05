@@ -1,0 +1,31 @@
+{% extends 'zxc/base.html' %}
+
+{% block content %}
+<h2 class="my-4">Ваш профиль: <strong>{{ user.first_name }}</strong></h2>
+
+{% if student_courses %}
+    <h3>Взятые курсы:</h3>
+    <ul class="list-group">
+        {% for course in student_courses %}
+            <li class="list-group-item">
+                <strong>{{ course.title }}</strong>
+                <img src="{{ course.photo.url }}" alt="Обложка {{ course.title }}" class="course-image" width="200" height="200">
+                <p>{{ course.description }}</p>
+                <p><strong>Преподаватели:</strong>
+                    {% for teacher in course.teacher.all %}
+                        {{ teacher.first_name }} {{ teacher.middle_name }} {{ teacher.last_name }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        Преподаватели не указаны.
+                    {% endfor %}
+                </p>
+                <p><strong>Длительность:</strong> {{ course.duration.duration|default:"-" }} месяцев</p>
+                <p><strong>Стоимость:</strong> {{ course.price|default:"-" }} руб.</p>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Вы ещё не записаны ни на один курс.</p>
+    <a href="{% url 'index' %}" class="btn btn-primary mt-3">Записаться на курс</a>
+{% endif %}
+{% endblock content %}
+
