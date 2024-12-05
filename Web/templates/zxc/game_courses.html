@@ -1,0 +1,47 @@
+{% extends 'zxc/base.html' %}
+
+{% block content %}
+    <h1>Игры</h1>
+    {% if courses %}
+        <div class="courses-container">
+            {% for course in courses %}
+                <div class="course-item">
+                    <h2>{{ course.title }}</h2>
+                    {% if course.photo %}
+                        <img src="{{ course.photo.url }}" alt="Обложка {{ course.title }}" class="course-image" width="200" height="200">
+                    {% else %}
+                        <p>Обложка недоступна.</p>
+                    {% endif %}
+                    
+                    <button class="show-info-btn" onclick="toggleInfo('{{ forloop.counter }}')">Показать информацию</button>
+                    
+                    <div id="info-{{ forloop.counter }}" class="course-info" style="display: none;">
+                        <p><strong>Описание:</strong> {{ course.description|default:"Нет описания" }}</p>
+                        <p><strong>Преподаватели:</strong>
+                            {% for teacher in course.teacher.all %}
+                                {{ teacher.first_name }} {{ teacher.middle_name }} {{ teacher.last_name }}{% if not forloop.last %}, {% endif %}
+                            {% empty %}
+                                Преподаватели не указаны.
+                            {% endfor %}
+                        </p>
+                        <p><strong>Длительность:</strong> {{ course.duration.duration|default:"-" }} месяцев</p>
+                        <p><strong>Стоимость:</strong> {{ course.price|default:"-" }} руб.</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Курсы по программированию пока не добавлены.</p>
+    {% endif %}
+    
+    <script>
+        function toggleInfo(courseId) {
+            const infoBlock = document.getElementById(`info-${courseId}`);
+            if (infoBlock.style.display === "none") {
+                infoBlock.style.display = "block";
+            } else {
+                infoBlock.style.display = "none";
+            }
+        }
+    </script>
+{% endblock %}

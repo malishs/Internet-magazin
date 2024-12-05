@@ -1,0 +1,32 @@
+{% extends 'zxc/base.html' %}
+
+{% block content %}
+<h1>Мои курсы</h1>
+
+{% if courses %}
+    <ul>
+        {% for course in courses %}
+        <li>
+            <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 20px;">
+                <h2>{{ course.title }}</h2>
+                <p><strong>Категория:</strong> {{ course.get_categorycourse_display }}</p>
+                <p><strong>Описание:</strong> {{ course.description }}</p>
+                <p><strong>Стоимость:</strong> {{ course.price }} ₽</p>
+                <p><strong>Длительность:</strong> {{ course.duration }}</p>
+                {% if course.teacher.count > 0 %}
+                    <p><strong>Преподаватели:</strong> 
+                        {% for teacher in course.teacher.all %}
+                            {{ teacher }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                {% endif %}
+                <img src="{{ course.photo.url }}" alt="Обложка курса" style="max-width: 200px;">
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>У вас нет взятых курсов.</p>
+{% endif %}
+
+{% endblock %}

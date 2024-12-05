@@ -1,0 +1,67 @@
+{% extends "zxc/base.html" %}
+<head>
+{% load static %}
+<style>
+    .card {
+        flex: 1 1 auto; /* Увеличивает гибкость ширины карточек */
+        min-width: 300px; /* Минимальная ширина карточки */
+    }
+    .card-deck {
+        gap: 20px; /* Расстояние между карточками */
+    }
+</style>
+</head>
+{% block content %}
+<div class="container-fluid">
+    <!-- Оглавление -->
+    <div class="row my-2">
+        <div class="col text-center">
+            <h2>Контакты</h2>
+        </div>
+    </div>
+    <!-- Название блока -->
+    <div class="row my-2 text-primary text-center">
+        <h3>{{ name }}</h3>
+    </div>
+    <div class="row my-2 text-muted text-center">
+        <h4>{{ text_head }}</h4>
+    </div>
+
+    <!-- Блок контактов -->
+    <div class="row my-4 justify-content-center">
+        <div class="col-10">
+            <div class="card-deck">
+                <!-- Первый блок контактов -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Общие вопросы</h5>
+                        <p class="card-text">Email: hello@online-course.ru</p>
+                        <p class="card-text">Телефон: 8 (800) 123-45-67</p>
+                        <p class="card-text">Вопросы по покупке, оплате и содержанию курсов</p>
+                    </div>
+                </div>
+
+                <!-- Второй блок контактов -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Пресс-служба</h5>
+                        <p class="card-text">Email: support@online-course.ru</p>
+                        <p class="card-text">Телефон: +7 (495) 123-45-67</p>
+                        <p class="card-text">Вопросы по учебному процессу, если вы уже проходите курс</p>
+                    </div>
+                </div>
+
+                <!-- Третий блок контактов -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Редакция Online-курс</h5>
+                        <p class="card-text">Email: info@media.online-course.ru</p>
+                        <p class="card-text">Адрес: 119049, г. Москва, Ленинский пр., д. 6, стр. 20</p>
+                        <p class="card-text">Почтовый адрес</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
