@@ -34,6 +34,7 @@ urlpatterns = [
     path('game_courses/', views.game_courses, name='game_courses'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('profile/', views.profile, name='profile'),
+    path('api/', include('zxc.urls')),
 ] 
 # + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

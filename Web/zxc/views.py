@@ -3,6 +3,9 @@ from django.http import HttpResponse
 from .models import Course, Teacher
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.decorators import login_required
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .serializers import CourseSerializer
 
 def index(request): 
     text_head = 'Online-курс. На нашем сайте вы можете получить опыт в IT-сфере!'
@@ -56,3 +59,9 @@ def profile(request):
     # Фильтруем только те курсы, где студент — это текущий пользователь
     student_courses = Course.objects.filter(student=request.user)
     return render(request, 'zxc/profile.html', {'student_courses': student_courses})
+
+class CourseView(APIView):
+    def get(self, request):
+        course = Course.objects.all()
+        serializer = CourseSerializer(course, many = True)
+        return Response({"course": serializer.data})
