@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import CourseSerializer
+from rest_framework.generics import get_object_or_404, GenericAPIView, ListCreateAPIView, RetrieveUpdateAPIView
+from rest_framework.mixins import ListModelMixin
 
 def index(request): 
     text_head = 'Online-курс. На нашем сайте вы можете получить опыт в IT-сфере!'
@@ -60,8 +62,31 @@ def profile(request):
     student_courses = Course.objects.filter(student=request.user)
     return render(request, 'zxc/profile.html', {'student_courses': student_courses})
 
-class CourseView(APIView):
-    def get(self, request):
-        course = Course.objects.all()
-        serializer = CourseSerializer(course, many = True)
-        return Response({"course": serializer.data})
+class CourseView(ListCreateAPIView):
+    quaryset = Course.objects.all()
+    serializer_class = CourseSerializer
+    def perform_create(self, serializer):
+        teacher = get_object_or_404(Teacher, id=self.request.data.get('teacher'))
+        return serializer.save(teacher=teacher) 
+class SingleCourseView(RetrieveUpdateAPIView):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+    
+    # def put(self, request, pk):
+    #     saved_course = get_object_or_404(Course.objects.all(), pk=pk)
+    #     data = request.data.get('course')
+    #     serializer = CourseSerializer(instance=saved_course, data=data, partial=True)
+
+    #     if serializer.is_valid(raise_exception=True):
+    #         course_saved = serializer.save()
+
+    #     return Response({
+    #         "success": "Course '{}' updated successfully".format(course_saved.title)
+    #     })
+    # def delete(self, request, pk):
+    # # Get object with this pk
+    #     course = get_object_or_404(Course.objects.all(), pk=pk)
+    #     course.delete()
+    #     return Response({
+    #         "message": "Article with id `{}` has been deleted.".format(pk)
+    #     }, status=204)
