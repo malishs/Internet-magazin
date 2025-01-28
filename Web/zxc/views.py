@@ -1,13 +1,10 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import render, get_object_or_404
 from .models import Course, Teacher
-from django.views.generic import ListView, DetailView
 from django.contrib.auth.decorators import login_required
-from rest_framework.response import Response
-from rest_framework.views import APIView
 from .serializers import CourseSerializer
-from rest_framework.generics import get_object_or_404, GenericAPIView, ListCreateAPIView, RetrieveUpdateAPIView
-from rest_framework.mixins import ListModelMixin
+from rest_framework.generics import get_object_or_404, ListCreateAPIView, RetrieveDestroyAPIView
+from rest_framework.response import Response
+from rest_framework import viewsets
 
 def index(request): 
     text_head = 'Online-курс. На нашем сайте вы можете получить опыт в IT-сфере!'
@@ -62,13 +59,23 @@ def profile(request):
     student_courses = Course.objects.filter(student=request.user)
     return render(request, 'zxc/profile.html', {'student_courses': student_courses})
 
-class CourseView(ListCreateAPIView):
-    quaryset = Course.objects.all()
+class CourseViewSet(viewsets.ModelViewSet):
+    queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    def perform_create(self, serializer):
-        teacher = get_object_or_404(Teacher, id=self.request.data.get('teacher'))
-        return serializer.save(teacher=teacher) 
-class SingleCourseView(RetrieveUpdateAPIView):
+    # def perform_create(self, serializer):
+    #     teacher = get_object_or_404(Teacher, id=self.request.data.get('teacher'))
+    #     return serializer.save(teacher=teacher) 
+    # def list (self, request):
+    #     queryset = Course.objects.all()
+    #     serializer = CourseSerializer(queryset, many = True)
+    #     return Response
+    # def retrieve(self, request, pk=None):
+    #     queryset = Course.objects.all()
+    #     user = get_object_or_404(queryset, pk=pk)
+    #     serializer = CourseSerializer(user)
+    #     return Response(serializer.data)
+
+class SingleCourseView(RetrieveDestroyAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     
