@@ -2,13 +2,26 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status, serializers
 from rest_framework.views import APIView
-from .models import Course, Teacher
+from .models import Course, Teacher, User
 
-# Serializer using ModelSerializer for automatic handling of CRUD operations
+
+class TeacherSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Teacher
+        fields = '__all__'
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
+
 class CourseSerializer(serializers.ModelSerializer):
+    teacher = TeacherSerializer(many=True)  # Используем TeacherSerializer
+    # student = UserSerializer(many=True)  # Используем UserSerializer
+
     class Meta:
         model = Course
-        fields = ('id', 'title', 'categorycourse', 'price', 'teacher')
+        fields = ('id', 'title', 'categorycourse', 'price', 'teacher', 'student')
 
     # def create(self, validated_data):
     #     teacher_id = validated_data.pop('teacher_id')

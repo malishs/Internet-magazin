@@ -1,6 +1,5 @@
 from django.db import models
 from django.urls import reverse
-from django.contrib.auth.models import User
 from datetime import date
     
 
@@ -35,44 +34,7 @@ class DurationCourse(models.Model):
 
     def __str__(self):
         return str(self.duration)
-
-class Course(models.Model):
-    title = models.CharField(max_length=200,
-                            help_text="Введите название курса",
-                            verbose_name="Название курса")
-    categorycourse = models.CharField(max_length=50,
-                                        choices=[('programming', 'Программирование'),
-                                                ('english', 'Английский язык'),
-                                                ('game', 'Игры'),
-                                                ('music_and_cinema', 'Кино и музыка')], default='programming')
-    description = models.TextField(help_text="Введите описание курса",
-                                    verbose_name="Описание курса")
-    teacher = models.ManyToManyField('Teacher',
-                                help_text="Выберите преподавателя (преподавателей) для курса",
-                                verbose_name="Преподаватель (преподаватели) курса")
-    duration = models.ForeignKey('DurationCourse', on_delete=models.CASCADE,
-                                help_text="Введите длительность курса",
-                                verbose_name="Длительность курса")
-    student = models.ForeignKey(User, on_delete=models.SET_NULL,
-                                null=True, blank=True,
-                                verbose_name="Студент",
-                                help_text='Выберите студента курса')
-    price = models.DecimalField(decimal_places=2, max_digits=7,
-                                help_text="Введите стоимость курса",
-                                verbose_name="Стоимость курса")
-    photo = models.ImageField(upload_to='course_photos/',
-                                help_text="Введите обложку курса",
-                                verbose_name="Обложка курса",
-                                null=False)
-
-    def __str__(self):
-        return self.title
-
-    def display_teacher(self):
-        return ', '.join([teacher.middle_name for teacher in self.teacher.all()])
     
-    display_teacher.short_description = "Преподаватели"
-
 class User(models.Model):
     STATUS_CHOICES = [
                 ('Да', 'Да'),
@@ -96,7 +58,8 @@ class User(models.Model):
                         on_delete=models.CASCADE,
                         null=True, blank=True,
                         help_text="Выберите курс",
-                        verbose_name="Курс")
+                        verbose_name="Курс",
+                        related_name='course')
     completion_date = models.DateField(null=True, blank=True,
                                         help_text="Введите дату окончания прохождения курса",
                                         verbose_name="Дата окончания прохождения курса")
@@ -108,3 +71,41 @@ class User(models.Model):
     def __str__(self):
         return self.middle_name
     
+class Course(models.Model):
+    title = models.CharField(max_length=200,
+                            help_text="Введите название курса",
+                            verbose_name="Название курса")
+    categorycourse = models.CharField(max_length=50,
+                                        choices=[('programming', 'Программирование'),
+                                                ('english', 'Английский язык'),
+                                                ('game', 'Игры'),
+                                                ('music_and_cinema', 'Кино и музыка')], default='programming')
+    description = models.TextField(help_text="Введите описание курса",
+                                    verbose_name="Описание курса")
+    teacher = models.ManyToManyField('Teacher',
+                                help_text="Выберите преподавателя (преподавателей) для курса",
+                                verbose_name="Преподаватель (преподаватели) курса")
+    duration = models.ForeignKey('DurationCourse', on_delete=models.CASCADE,
+                                help_text="Введите длительность курса",
+                                verbose_name="Длительность курса")
+    student = models.ForeignKey(User, on_delete=models.SET_NULL,
+                                null=True, blank=True,
+                                verbose_name="Студент",
+                                related_name='student',
+                                help_text='Выберите студента курса')
+    price = models.DecimalField(decimal_places=2, max_digits=7,
+                                help_text="Введите стоимость курса",
+                                verbose_name="Стоимость курса")
+    photo = models.ImageField(upload_to='course_photos/',
+                                help_text="Введите обложку курса",
+                                verbose_name="Обложка курса",
+                                null=False)
+
+    def __str__(self):
+        return self.title
+
+    def display_teacher(self):
+        return ', '.join([teacher.middle_name for teacher in self.teacher.all()])
+    
+    display_teacher.short_description = "Преподаватели"
+

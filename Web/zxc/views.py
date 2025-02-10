@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Course, Teacher
+from .models import Course, Teacher, User
 from django.contrib.auth.decorators import login_required
-from .serializers import CourseSerializer
+from .serializers import CourseSerializer, TeacherSerializer, UserSerializer
 from rest_framework.generics import get_object_or_404, ListCreateAPIView, RetrieveDestroyAPIView
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -78,7 +78,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 class SingleCourseView(RetrieveDestroyAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    
+
     # def put(self, request, pk):
     #     saved_course = get_object_or_404(Course.objects.all(), pk=pk)
     #     data = request.data.get('course')
@@ -97,3 +97,13 @@ class SingleCourseView(RetrieveDestroyAPIView):
     #     return Response({
     #         "message": "Article with id `{}` has been deleted.".format(pk)
     #     }, status=204)
+
+# ViewSet для модели Teacher
+class TeacherViewSet(viewsets.ModelViewSet):
+    queryset = Teacher.objects.all()
+    serializer_class = TeacherSerializer
+
+# ViewSet для модели User
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
