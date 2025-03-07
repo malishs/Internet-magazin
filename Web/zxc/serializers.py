@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status, serializers
 from rest_framework.views import APIView
-from .models import Course, Teacher, User
+from .models import Course, Teacher, CustomUser
 
 
 class TeacherSerializer(serializers.ModelSerializer):
@@ -12,7 +12,7 @@ class TeacherSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = CustomUser
         fields = '__all__'
 
 class CourseSerializer(serializers.ModelSerializer):

@@ -32,13 +32,13 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'zxc',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'zxc',
     'rest_framework',
 ]
 
@@ -147,3 +147,4 @@ DEBUG = True
 #     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
 #     ]
 # }
+AUTH_USER_MODEL = 'zxc.CustomUser'

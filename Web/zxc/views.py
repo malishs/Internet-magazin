@@ -1,10 +1,14 @@
-from django.shortcuts import render, get_object_or_404
-from .models import Course, Teacher, User
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Course, Teacher, CustomUser
 from django.contrib.auth.decorators import login_required
 from .serializers import CourseSerializer, TeacherSerializer, UserSerializer
 from rest_framework.generics import get_object_or_404, ListCreateAPIView, RetrieveDestroyAPIView
 from rest_framework.response import Response
 from rest_framework import viewsets
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login, logout
+from .forms import CustomUserCreationForm
+from django.contrib.auth.decorators import login_required
 
 def index(request): 
     text_head = 'Online-курс. На нашем сайте вы можете получить опыт в IT-сфере!'
@@ -59,6 +63,38 @@ def profile(request):
     student_courses = Course.objects.filter(student=request.user)
     return render(request, 'zxc/profile.html', {'student_courses': student_courses})
 
+def register_view(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # Автоматически входим в аккаунт после регистрации
+            return redirect('home')  # Перенаправляем на главную страницу (измените 'home' на вашу)
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'zxc/register.html', {'form': form}) #Укажите путь к шаблону
+
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('home')  # Перенаправляем на главную страницу
+    else:
+        form = AuthenticationForm()
+    return render(request, 'zxc/login.html', {'form': form})  #Укажите путь к шаблону
+
+@login_required  # Требует авторизации для доступа
+def logout_view(request):
+    logout(request)
+    return redirect('home') # Перенаправляем на главную страницу
+
+@login_required # Пример страницы, требующей авторизации
+def profile_view(request):
+    return render(request, 'zxc/profile.html') #Укажите путь к шаблону
+
+
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
@@ -105,5 +141,5 @@ class TeacherViewSet(viewsets.ModelViewSet):
 
 # ViewSet для модели User
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = UserSerializer

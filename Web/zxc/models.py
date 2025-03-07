@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from datetime import date
+from django.contrib.auth.models import AbstractUser
     
 
 class Teacher(models.Model):
@@ -35,41 +36,23 @@ class DurationCourse(models.Model):
     def __str__(self):
         return str(self.duration)
     
-class User(models.Model):
-    STATUS_CHOICES = [
-                ('Да', 'Да'),
-                ('Нет', 'Нет'),
-    ]
-
-    first_name = models.CharField(max_length=100,
-                                help_text="Введите имя студента",
-                                verbose_name="Имя студента")
-    middle_name = models.CharField(max_length=100,
-                                help_text="Введите фамилию студента",
-                                verbose_name="Фамилия студента")
-    last_name = models.CharField(max_length=100,
-                                help_text="Введите отчество студента",
-                                verbose_name="Отчество студента")
-    statusych = models.CharField(max_length=3,
-                                help_text="Введите статус прохождения курса",
-                                verbose_name="Статус прохождения курса",
-                                choices=STATUS_CHOICES)
-    course = models.ForeignKey('Course', 
-                        on_delete=models.CASCADE,
-                        null=True, blank=True,
-                        help_text="Выберите курс",
-                        verbose_name="Курс",
-                        related_name='course')
-    completion_date = models.DateField(null=True, blank=True,
-                                        help_text="Введите дату окончания прохождения курса",
-                                        verbose_name="Дата окончания прохождения курса")
-    datereg = models.DateField(null=True, blank=True,
-                                help_text="Введите дату регистрации на сайт",
-                                verbose_name="Дата регистрации на сайт")
-    
+class CustomUser(AbstractUser):
+    bio = models.TextField(blank=False)
+    username = models.CharField(
+        max_length=150,
+        unique=True,  # Вот это изменение
+        help_text=(
+            "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+        ),
+        error_messages={
+            "unique": "A user with that username already exists.",
+        },
+    )
+    email = models.TextField()
+    pass 
 
     def __str__(self):
-        return self.middle_name
+        return self.username
     
 class Course(models.Model):
     title = models.CharField(max_length=200,
@@ -88,7 +71,7 @@ class Course(models.Model):
     duration = models.ForeignKey('DurationCourse', on_delete=models.CASCADE,
                                 help_text="Введите длительность курса",
                                 verbose_name="Длительность курса")
-    student = models.ForeignKey(User, on_delete=models.SET_NULL,
+    student = models.ForeignKey(CustomUser, on_delete=models.SET_NULL,
                                 null=True, blank=True,
                                 verbose_name="Студент",
                                 related_name='student',

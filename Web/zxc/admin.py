@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Teacher, DurationCourse, Course, User
+from .models import Teacher, DurationCourse, Course, CustomUser
 from django import forms
 from django.utils.html import format_html
 
@@ -15,4 +15,4 @@ class TeacherAdmin(admin.ModelAdmin):
 admin.site.register(Teacher, TeacherAdmin)
 admin.site.register(DurationCourse)
 admin.site.register(Course)
-admin.site.register(User)
+admin.site.register(CustomUser)
