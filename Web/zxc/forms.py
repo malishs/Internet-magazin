@@ -1,18 +1,11 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from .models import CustomUser
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from models import CustomUser
 
 class CustomUserCreationForm(UserCreationForm):
-
     class Meta:
-        model = CustomUser
-        fields = ('username', 'email', 'first_name', 'last_name') # Поля для формы
-        #Если не используете кастомную модель, то fields = UserCreationForm.Meta.fields + ('first_name', 'last_name', 'email')
+        model = CustomUser()
+        fields = ('username', 'email', 'password') # Поля для формы
 
-
-class CustomUserChangeForm(UserChangeForm):
-
-    class Meta:
-        model = CustomUser
-        fields = ('username', 'email', 'first_name', 'last_name') # Поля для формы
-        #Если не используете кастомную модель, то fields = UserChangeForm.Meta.fields + ('first_name', 'last_name', 'email')
+class LoginForm(AuthenticationForm):
+    pass

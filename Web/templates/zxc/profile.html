@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+{% extends 'zxc/base.html' %}
 <html>
-<head>
-    <title>Profile</title>
-</head>
-<body>
-    <h1>Profile</h1>
-    <p>Welcome, {{ user.username }}!</p>
-    <p>Email: {{ user.email }}</p>
-    <a href="{% url 'logout' %}">Logout</a>
-</body>
-</html>
+    <head>
+        <title>Профиль</title>
+    </head>
+    <body>
+        <h1>Профиль</h1>
+        <p>Добро пожаловать, {{ user.username }}!</p>
+        <p>Email: {{ user.email }}</p>
+        <a href="{% url 'logout' %}">Выйти</a>
+    </body>
+    </html>

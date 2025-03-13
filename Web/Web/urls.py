@@ -37,6 +37,9 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('register/', views.register_view, name='register'),
     path('api/', include('zxc.urls')),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+
 ] 
 # + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

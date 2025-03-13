@@ -49,6 +49,7 @@ class CustomUser(AbstractUser):
         },
     )
     email = models.TextField()
+    password = models.TextField()
     pass 
 
     def __str__(self):
