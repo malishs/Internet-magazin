@@ -3,18 +3,17 @@ from .models import Course, Teacher, CustomUser
 from django.contrib.auth.decorators import login_required
 from .serializers import CourseSerializer, TeacherSerializer, UserSerializer
 from rest_framework.generics import get_object_or_404, ListCreateAPIView, RetrieveDestroyAPIView
-from rest_framework.response import Response
 from rest_framework import viewsets
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import login, logout
 from .forms import CustomUserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from .forms import CustomUserCreationForm, LoginForm
+from .forms import CustomUserCreationForm, CustomLoginForm, ProfileUpdateForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
+from django.urls import reverse
 
 def index(request): 
     text_head = 'Online-курс. На нашем сайте вы можете получить опыт в IT-сфере!'
@@ -118,41 +117,56 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
 
-def register_view(request):
+def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            username = form.cleaned_data.get('username')
-            messages.success(request, f'Аккаунт успешно создан для {username}!')
-            login(request, user)  # Автоматически входим в аккаунт после регистрации
-            return redirect('home')  # Перенаправляем на главную страницу (измените 'home' на вашу)
-        else:
-            for error in list(form.errors.values()):
-                messages.error(request, error)
-
+            form.save()
+            return redirect('login')  # Redirect to login after successful registration
     else:
         form = CustomUserCreationForm()
-    return render(request, 'zxc/register.html', {'form': form}) #Укажите путь к шаблону
+    return render(request, 'registration/register.html', {'form': form})
 
 def login_view(request):
     if request.method == 'POST':
-        form = LoginForm(request, data=request.POST)
+        form = CustomLoginForm(request, data=request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password(request,"Неверное имя пользователя или пароль"')
-        else:
-            messages.error(request,"Неверное имя пользователя или пароль")
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('home')  # Замените на вашу домашнюю страницу
+    else:
+        form = CustomLoginForm()
+    
+    return render(request, 'zxc/login.html', {'form': form})
 
-    form = LoginForm()
-    return render(request, 'zxc/login.html', {'form': form})  #Укажите путь к шаблону
-
-@login_required  # Требует авторизации для доступа
-def logout_view(request):
-    logout(request)
-    messages.info(request, "Вы вышли из аккаунта!")
-    return redirect('index.html') # Перенаправляем на главную страницу
-
-@login_required # Пример страницы, требующей авторизации
+@login_required
 def profile_view(request):
-    return render(request, 'zxc/profile.html') #Укажите путь к шаблону
+    if request.method == 'POST':
+        form = ProfileUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')  # Или на страницу профиля
+    else:
+        form = ProfileUpdateForm(instance=request.user)
+
+    return render(request, 'zxc/profile.html', {'form': form})
+
+@login_required
+def add_course_to_profile(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+
+    # Добавляем курс к пользователю
+    course.students.add(request.user)
+
+    return redirect('course_list')  # Перенаправляем на страницу списка курсов
+from django.views.generic import ListView
+from .models import Course
+
+
+class CourseListView(ListView):
+    model = Course
+    template_name = 'courses/course_list.html'  # Укажите ваш шаблон
+    context_object_name = 'courses'

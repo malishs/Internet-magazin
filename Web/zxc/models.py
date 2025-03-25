@@ -38,52 +38,49 @@ class DurationCourse(models.Model):
     
 class CustomUser(AbstractUser):
     bio = models.TextField(blank=False)
-    username = models.CharField(
-        max_length=150,
-        unique=True,  # Вот это изменение
-        help_text=(
-            "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-        ),
-        error_messages={
-            "unique": "A user with that username already exists.",
-        },
-    )
-    email = models.TextField()
-    password = models.TextField()
-    pass 
+    email = models.EmailField(unique=True)  # Ensure emails are unique and enforce email format
 
     def __str__(self):
         return self.username
     
+    @property
+    def courses(self):
+        return self.student.all()
+    
 class Course(models.Model):
     title = models.CharField(max_length=200,
-                            help_text="Введите название курса",
-                            verbose_name="Название курса")
+                             help_text="Введите название курса",
+                             verbose_name="Название курса")
     categorycourse = models.CharField(max_length=50,
-                                        choices=[('programming', 'Программирование'),
+                                       choices=[('programming', 'Программирование'),
                                                 ('english', 'Английский язык'),
                                                 ('game', 'Игры'),
-                                                ('music_and_cinema', 'Кино и музыка')], default='programming')
+                                                ('music_and_cinema', 'Кино и музыка')],
+                                       default='programming')
     description = models.TextField(help_text="Введите описание курса",
-                                    verbose_name="Описание курса")
+                                   verbose_name="Описание курса")
     teacher = models.ManyToManyField('Teacher',
-                                help_text="Выберите преподавателя (преподавателей) для курса",
-                                verbose_name="Преподаватель (преподаватели) курса")
+                                      help_text="Выберите преподавателя (преподавателей) для курса",
+                                      verbose_name="Преподаватель (преподаватели) курса")
     duration = models.ForeignKey('DurationCourse', on_delete=models.CASCADE,
-                                help_text="Введите длительность курса",
-                                verbose_name="Длительность курса")
-    student = models.ForeignKey(CustomUser, on_delete=models.SET_NULL,
-                                null=True, blank=True,
-                                verbose_name="Студент",
-                                related_name='student',
-                                help_text='Выберите студента курса')
+                                  help_text="Введите длительность курса",
+                                  verbose_name="Длительность курса")
+    students = models.ManyToManyField(CustomUser, blank=True, related_name='courses', help_text='Выберите студентов, записанных на этот курс')
     price = models.DecimalField(decimal_places=2, max_digits=7,
                                 help_text="Введите стоимость курса",
                                 verbose_name="Стоимость курса")
     photo = models.ImageField(upload_to='course_photos/',
-                                help_text="Введите обложку курса",
-                                verbose_name="Обложка курса",
-                                null=False)
+                              help_text="Введите обложку курса",
+                              verbose_name="Обложка курса",
+                              null=False)
+
+    def __str__(self):
+        return self.title
+
+    def display_teacher(self):
+        return ', '.join([teacher.middle_name for teacher in self.teacher.all()])
+
+    display_teacher.short_description = "Преподаватели"
 
     def __str__(self):
         return self.title

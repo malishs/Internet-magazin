@@ -1,0 +1,17 @@
+{% extends 'zxc/base.html' %}
+
+{% block content %}
+    <h1>Список курсов</h1>
+    {% if courses %}
+        <ul>
+            {% for course in courses %}
+                <li>
+                    {{ course.title }} - {{ course.price }} руб.
+                    <!-- Добавьте любые другие поля, которые хотите отобразить -->
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Курсы не найдены.</p>
+    {% endif %}
+{% endblock %}

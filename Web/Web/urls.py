@@ -25,8 +25,9 @@ from django.contrib.auth import views as auth_views
 from zxc import urls
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', views.index, name='home'),
     path('admin/', admin.site.urls),
+    path('', include('zxc.urls')),
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
     path('programming_courses/', views.programming_courses, name='programming_courses'),
@@ -35,13 +36,22 @@ urlpatterns = [
     path('game_courses/', views.game_courses, name='game_courses'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('profile/', views.profile, name='profile'),
-    path('register/', views.register_view, name='register'),
+    path('register/', views.register, name='register'),
     path('api/', include('zxc.urls')),
     path('login/', views.login_view, name='login'),
-    path('logout/', views.logout_view, name='logout'),
+    path('profile/', views.profile_view, name='profile'),
+    path('add_course/<int:course_id>/', views.add_course_to_profile, name='add_course_to_profile'),
+    path('courses/', views.CourseListView.as_view(), name='course_list'),
 
 ] 
-# + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-# if settings.DEBUG:
-  #  urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += [
+    path('login/', auth_views.LoginView.as_view(), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+]
