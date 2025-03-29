@@ -27,11 +27,17 @@
                         <p><strong>Длительность:</strong> {{ course.duration.duration|default:"-" }} месяцев</p>
                         <p><strong>Стоимость:</strong> {{ course.price|default:"-" }} руб.</p>
                     </div>
+
+                    <!-- Form to add course to profile -->
+                    <form action="{% url 'add_course_to_profile' course.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="add-course-btn">Добавить в профиль</button>
+                    </form>
                 </div>
             {% endfor %}
         </div>
     {% else %}
-        <p>Курсы по программированию пока не добавлены.</p>
+        <p>Курсы по кино и музыке пока не добавлены.</p>
     {% endif %}
     
     <script>

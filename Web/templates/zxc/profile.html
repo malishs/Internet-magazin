@@ -1,7 +1,5 @@
 {% extends 'zxc/base.html' %}
 
-{% block title %}Ваш Профиль{% endblock title %}
-
 {% block content %}
 <div class="container">
     <h2>Ваш Профиль</h2>
@@ -12,7 +10,7 @@
     </form>
     <h3>Ваши Курсы</h3>
     <ul>
-        {% for course in user.courses %}
+        {% for course in courses %}
             <li>{{ course.title }}</li>
         {% empty %}
             <li>У вас еще нет курсов.</li>

@@ -35,7 +35,6 @@ urlpatterns = [
     path('musicandcinema/', views.musicandcinema_courses, name='musicandcinema_courses'),
     path('game_courses/', views.game_courses, name='game_courses'),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('profile/', views.profile, name='profile'),
     path('register/', views.register, name='register'),
     path('api/', include('zxc.urls')),
     path('login/', views.login_view, name='login'),
@@ -44,8 +43,8 @@ urlpatterns = [
     path('courses/', views.CourseListView.as_view(), name='course_list'),
 
 ] 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# if settings.DEBUG:
+#     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += [
     path('login/', auth_views.LoginView.as_view(), name='login'),

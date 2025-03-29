@@ -17,11 +17,10 @@ class UserSerializer(serializers.ModelSerializer):
 
 class CourseSerializer(serializers.ModelSerializer):
     teacher = TeacherSerializer(many=True)  # Используем TeacherSerializer
-    # student = UserSerializer(many=True)  # Используем UserSerializer
 
     class Meta:
         model = Course
-        fields = ('id', 'title', 'categorycourse', 'price', 'teacher', 'student')
+        fields = ('id', 'title', 'categorycourse', 'price', 'teacher', 'students')
 
     # def create(self, validated_data):
     #     teacher_id = validated_data.pop('teacher_id')

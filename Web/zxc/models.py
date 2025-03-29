@@ -45,7 +45,7 @@ class CustomUser(AbstractUser):
     
     @property
     def courses(self):
-        return self.student.all()
+        return self.students.all()
     
 class Course(models.Model):
     title = models.CharField(max_length=200,
@@ -79,14 +79,5 @@ class Course(models.Model):
 
     def display_teacher(self):
         return ', '.join([teacher.middle_name for teacher in self.teacher.all()])
-
-    display_teacher.short_description = "Преподаватели"
-
-    def __str__(self):
-        return self.title
-
-    def display_teacher(self):
-        return ', '.join([teacher.middle_name for teacher in self.teacher.all()])
     
     display_teacher.short_description = "Преподаватели"
-

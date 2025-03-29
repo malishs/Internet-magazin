@@ -61,13 +61,6 @@ def game_courses(request):
     courses = Course.objects.filter(categorycourse="game")
     return render(request, 'zxc/game_courses.html', {'courses': courses})
 
-
-@login_required
-def profile(request):
-    # Фильтруем только те курсы, где студент — это текущий пользователь
-    student_courses = Course.objects.filter(student=request.user)
-    return render(request, 'zxc/profile.html', {'student_courses': student_courses})
-
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
@@ -148,20 +141,23 @@ def profile_view(request):
         form = ProfileUpdateForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
-            return redirect('profile')  # Или на страницу профиля
+            return redirect('profile')
     else:
         form = ProfileUpdateForm(instance=request.user)
 
-    return render(request, 'zxc/profile.html', {'form': form})
+    # Retrieve courses for the logged-in user
+    user_courses = Course.objects.filter(students=request.user)  # Correctly using the related name
+
+    return render(request, 'zxc/profile.html', {'form': form, 'courses': user_courses})
 
 @login_required
 def add_course_to_profile(request, course_id):
     course = get_object_or_404(Course, id=course_id)
 
-    # Добавляем курс к пользователю
+    # Add course to the user
     course.students.add(request.user)
 
-    return redirect('course_list')  # Перенаправляем на страницу списка курсов
+    return redirect('course_list')  # Redirects to the course list
 from django.views.generic import ListView
 from .models import Course
 
