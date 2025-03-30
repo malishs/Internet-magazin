@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -142,11 +143,48 @@ LOGIN_REDIRECT_URL = '/'
 
 DEBUG = True
 
-# REST_FRAMEWORK = {
-#     # Use Django's standard `django.contrib.auth` permissions,
-#     # or allow read-only access for unauthenticated users.
-#     'DEFAULT_PERMISSION_CLASSES': [
-#     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-#     ]
-# }
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+    'DEFAULT_VERSION': 'v1',
+    'ALLOWED_VERSIONS': ['v1', 'v2'],
+    'VERSION_PARAM': 'version',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 3,
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',  # JSON парсер
+        'rest_framework.parsers.MultiPartParser',   # Для загрузки файлов
+        'rest_framework_yaml.parsers.YAMLParser',
+        'rest_framework_xml.parsers.XMLParser',  
+    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+        'rest_framework_yaml.renderers.YAMLRenderer', 
+        'rest_framework_xml.renderers.XMLRenderer',
+        'rest_framework_jsonp.renderers.JSONPRenderer',
+        'drf_excel.renderers.XLSXRenderer',  
+    ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',    # для неаутентифицированных пользователей
+        'user': '1000/day'    # для аутентифицированных пользователей
+    },
+    # 'DEFAULT_METADATA_CLASS': 'zxc.metadata.CustomMetadata',
+    # 'DEFAULT_CONTENT_NEGOTIATION_CLASS': 'zxc.negotiation.IgnoreClientContentNegotiation',
+}
 AUTH_USER_MODEL = 'zxc.CustomUser'

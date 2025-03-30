@@ -2,6 +2,9 @@ from django.db import models
 from django.urls import reverse
 from datetime import date
 from django.contrib.auth.models import AbstractUser
+from pygments.lexers import get_lexer_by_name
+from pygments.formatters.html import HtmlFormatter
+from pygments import highlight
     
 
 class Teacher(models.Model):
@@ -27,7 +30,7 @@ class Teacher(models.Model):
                                 null=True, blank=True)
 
     def __str__(self):
-        return self.middle_name
+        return f"{self.first_name} {self.middle_name} {self.last_name}"
 
 class DurationCourse(models.Model):
     duration = models.IntegerField(help_text="Введите длительность курса",
@@ -72,7 +75,7 @@ class Course(models.Model):
     photo = models.ImageField(upload_to='course_photos/',
                               help_text="Введите обложку курса",
                               verbose_name="Обложка курса",
-                              null=False)
+                              null=True)
 
     def __str__(self):
         return self.title
@@ -81,3 +84,20 @@ class Course(models.Model):
         return ', '.join([teacher.middle_name for teacher in self.teacher.all()])
     
     display_teacher.short_description = "Преподаватели"
+
+class Snippet(models.Model):
+    owner = models.ForeignKey(CustomUser, related_name='snippets', on_delete=models.CASCADE)
+    code = models.TextField()
+    highlighted = models.TextField()
+    title = models.CharField(max_length=100, default='A snippet')
+    language = models.CharField(max_length=100, default='python')
+    linenos = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        lexer = get_lexer_by_name(self.language)
+        formatter = HtmlFormatter()
+        self.highlighted = highlight(self.code, lexer, formatter)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title

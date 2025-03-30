@@ -25,6 +25,20 @@ pip install markdown
 
 pip install django-filter
 
+pip install pygments
+
+pip install httpie
+
+pip install djangorestframework-yaml
+
+pip install djangorestframework-xml
+
+pip install djangorestframework-jsonp 
+
+pip install drf-excel 
+
+pip install django-filter 
+
 python manage.py runserver 
 
 python manage.py migrate
