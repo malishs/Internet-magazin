@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
+    'drf_spectacular',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -125,8 +127,9 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Укажите директорию для собранных статических файлов
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    os.path.join(BASE_DIR, "static"),  # Если у вас есть папка для статических файлов в проекте
 ]
 
 MEDIA_URL = '/media/'
@@ -146,6 +149,15 @@ DEBUG = True
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
+    'EXCEPTION_HANDLER': 'web.zxc.views.custom_exception_handler',
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'TEST_REQUEST_RENDERER_CLASSES': [ 
+        'rest_framework.renderers.MultiPartRenderer', 
+        'rest_framework.renderers.JSONRenderer', 
+        'rest_framework.renderers.TemplateHTMLRenderer' 
+    ],
+    'EXCEPTION_HANDLER': 'web.zxc.utils.custom_exception_handler',
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     'DEFAULT_VERSION': 'v1',
     'ALLOWED_VERSIONS': ['v1', 'v2'],
@@ -156,6 +168,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
@@ -188,3 +201,11 @@ REST_FRAMEWORK = {
     # 'DEFAULT_CONTENT_NEGOTIATION_CLASS': 'zxc.negotiation.IgnoreClientContentNegotiation',
 }
 AUTH_USER_MODEL = 'zxc.CustomUser'
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Online-kurs',
+    'DESCRIPTION': 'Api для просмотра, изменения, удаления данных на сайте Online-kurs',
+    'VERSION': '1.0.0',
+    'SWAGGER_UI_OAUTH2_REDIRECT_URL': '/o2c/',
+    # можете добавить другие опции
+}

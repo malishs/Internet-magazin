@@ -30,11 +30,21 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters 
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.negotiation import BaseContentNegotiation
-from rest_framework.views import APIView
+from rest_framework.views import APIView, exception_handler
 from .negotiation import IgnoreClientContentNegotiation  # Импортируем наш класс
 from .metadata import CustomMetadata  # Импортируем наш класс метаданных
+from drf_spectacular.utils import extend_schema_view, extend_schema
+from drf_spectacular.utils import extend_schema
+from django.utils.timezone import now
+from rest_framework.exceptions import APIException
+from rest_framework.reverse import reverse
+from rest_framework.settings import api_settings
 
 
+class SingleCourseView(viewsets.GenericViewSet):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 def index(request): 
     text_head = 'Online-курс. На нашем сайте вы можете получить опыт в IT-сфере!'
@@ -138,20 +148,35 @@ class CourseListView(ListView):
 
 # API
 
+class CoursePagination(PageNumberPagination):
+    page_size = 3  
+    page_size_query_param = 'page_size'
+    max_page_size = 100 
+
+@extend_schema_view(
+    list=extend_schema(description="Получение списка курсов"),
+    retrieve=extend_schema(description="Получение детали курса"),
+)
 class CourseViewSet(viewsets.ModelViewSet):
-    filterset_fields = ['title', 'teacher', 'categorycourse']  # Пример фильтров
+    """
+    Обработчик для курсов. Поддерживает операции CRUD и обеспечивает фильтрацию,
+    дросселирование и кэширование.
+    """
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    throttle_classes = [UserRateThrottle]  # Добавляем дросселирование
+    throttle_classes = [UserRateThrottle]
     filter_backends = [DjangoFilterBackend]
-    metadata_class = CustomMetadata  
-    
+    filterset_fields = ['title', 'teacher', 'categorycourse']
+    pagination_class = CoursePagination
 
-    @method_decorator(cache_page(60 * 60 * 2))  # Кэшируем на 2 часа
+    @method_decorator(cache_page(60 * 60 * 2))
     def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+        response = super().list(request, *args, **kwargs)
+        for course in response.data['results']:
+            course['url'] = request.build_absolute_uri(reverse('course-detail', args=[course['id']], request=request))
+        return response
 
-    @method_decorator(cache_page(60 * 60 * 2))  # Кэшируем на 2 часа
+    @method_decorator(cache_page(60 * 60 * 2))
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
 
@@ -159,38 +184,40 @@ class CourseViewSet(viewsets.ModelViewSet):
         if self.request.version == 'v1':
             return CourseSerializerVersion1
         elif self.request.version == 'v2':
-            return CourseSerializerVersion2  # Используем новый сериализатор для v2
-        return CourseSerializer  # Для всех остальных версий
-
-class SingleCourseView(RetrieveDestroyAPIView):
-    queryset = Course.objects.all()
-    serializer_class = CourseSerializer
+            return CourseSerializerVersion2
+        return CourseSerializer
 
 class TeacherViewSet(viewsets.ModelViewSet):
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
-    throttle_classes = [UserRateThrottle]  # Добавляем дросселирование
+    throttle_classes = [UserRateThrottle]
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
-    throttle_classes = [UserRateThrottle]  # Добавляем дросселирование
+    throttle_classes = [UserRateThrottle]
     renderer_classes = [JSONRenderer, BrowsableAPIRenderer]
-    filter_backends = [filters.OrderingFilter] 
-    ordering_fields = ['username', 'email'] 
-    ordering = ['username'] 
-    negotiation_class = IgnoreClientContentNegotiation
-
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['username', 'email']
+    ordering = ['username']
 
 class SnippetViewSet(viewsets.ModelViewSet):
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    throttle_classes = [UserRateThrottle]  # Добавляем дросселирование
+    throttle_classes = [UserRateThrottle]
     parser_classes = [JSONParser, MultiPartParser]
     renderer_classes = [JSONRenderer, BrowsableAPIRenderer]
-    filterset_fields = ['owner', 'title']  # Указание, что можно фильтровать по владельцу и заголовку
+    filterset_fields = ['owner', 'title']
+
+    @extend_schema(
+        request=SnippetSerializer,
+        responses={200: SnippetSerializer},
+        description="Создание нового сниппета"
+    )
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -199,17 +226,6 @@ class SnippetViewSet(viewsets.ModelViewSet):
     def highlight(self, request, *args, **kwargs):
         snippet = self.get_object()
         return Response(snippet.highlighted)
-
-class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Snippet.objects.all()
-    serializer_class = SnippetSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    throttle_classes = [UserRateThrottle]  # Добавляем дросселирование
-
-    def get_permissions(self):
-        if self.request.method in permissions.SAFE_METHODS:
-            return [permissions.AllowAny()]
-        return super().get_permissions()
 
 class CustomAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
@@ -223,7 +239,16 @@ class CustomAuthToken(ObtainAuthToken):
             'email': user.email
         })
 
-class CoursePagination(PageNumberPagination):
-    page_size = 10  # Устанавливаем размер страницы
-    page_size_query_param = 'page_size'  # Позволяем клиентам устанавливать размер страницы
-    max_page_size = 100  # Ограничиваем максимальный размер страницы
+def custom_exception_handler(exc, context):
+    response = exception_handler(exc, context)
+
+    # Добавляем код состояния HTTP в ответ
+    if response is not None:
+        response.data['status_code'] = response.status_code
+    else:
+        response = Response(
+            {'error': 'Internal Server Error', 'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+    return response

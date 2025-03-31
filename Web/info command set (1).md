@@ -37,7 +37,13 @@ pip install djangorestframework-jsonp
 
 pip install drf-excel 
 
-pip install django-filter 
+pip install django-filter
+
+pip install pyyaml uritemplate
+
+pip install drf-spectacular
+
+pip install pytest pytest-django
 
 python manage.py runserver 
 

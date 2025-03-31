@@ -16,7 +16,7 @@ class TeacherSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, style={'input_type': 'password'})
-    snippets = serializers.PrimaryKeyRelatedField(many=True, queryset=Snippet.objects.all())
+    snippets = serializers.PrimaryKeyRelatedField(many=True, queryset=Snippet.objects.all(), required=False)
 
     class Meta:
         model = CustomUser
@@ -24,11 +24,11 @@ class UserSerializer(serializers.ModelSerializer):
         validators = [UniqueValidator(queryset=CustomUser.objects.all())]
 
     def create(self, validated_data):
+        password = validated_data.pop('password')
         user = CustomUser(**validated_data)
-        user.set_password(validated_data.pop('password'))  # Хешируем пароль
+        user.set_password(password)  # Хешируем пароль
         user.save()
-        # Создание токена после создания пользователя
-        Token.objects.create(user=user)
+        Token.objects.create(user=user)  # Создание токена после создания пользователя
         return user
 
 class LengthSerializer(serializers.ModelSerializer):
@@ -54,10 +54,12 @@ class CourseSerializer(serializers.ModelSerializer):
         duration_instance = DurationCourse.objects.create(**duration_data)
         course = Course.objects.create(duration=duration_instance, **validated_data)
 
+        # Создание и добавление учителей
         for teacher in teacher_data:
             teacher_instance = Teacher.objects.create(**teacher)
             course.teacher.add(teacher_instance)
 
+        # Создание и добавление студентов
         for student in student_data:
             student_instance = UserSerializer().create(student)
             course.students.add(student_instance)
@@ -69,10 +71,12 @@ class CourseSerializer(serializers.ModelSerializer):
         student_data = validated_data.pop('students', [])
         duration_data = validated_data.pop('duration', {})
 
+        # Обновляем длительность курса
         if duration_data:
-            instance.duration.duration = duration_data['duration']  # Обновляем длительность
+            instance.duration.duration = duration_data['duration']
             instance.duration.save()
 
+        # Обновляем поля курса
         instance.title = validated_data.get('title', instance.title)
         instance.description = validated_data.get('description', instance.description)
         instance.save()
@@ -86,7 +90,7 @@ class CourseSerializer(serializers.ModelSerializer):
 
         # Обновляем студентов
         if student_data:
-            instance.students.clear()  # очищаем старые записи
+            instance.students.clear()
             for student in student_data:
                 student_instance = UserSerializer().create(student)
                 instance.students.add(student_instance)
@@ -107,7 +111,7 @@ class CourseSerializerVersion1(serializers.ModelSerializer):
 
 class CourseSerializerVersion2(serializers.ModelSerializer):
     teacher_names = serializers.StringRelatedField(many=True, source='teacher')
-    
+
     class Meta:
         model = Course
         fields = ['id', 'title', 'teacher_names', 'price']  # Поля для версии 2

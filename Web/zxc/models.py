@@ -71,7 +71,8 @@ class Course(models.Model):
     students = models.ManyToManyField(CustomUser, blank=True, related_name='courses', help_text='Выберите студентов, записанных на этот курс')
     price = models.DecimalField(decimal_places=2, max_digits=7,
                                 help_text="Введите стоимость курса",
-                                verbose_name="Стоимость курса")
+                                verbose_name="Стоимость курса",
+                                null=True)
     photo = models.ImageField(upload_to='course_photos/',
                               help_text="Введите обложку курса",
                               verbose_name="Обложка курса",
